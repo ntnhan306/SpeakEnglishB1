@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<title>Tomtat Speaking 1-5</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+/* Ẩn thanh cuộn */
+html, body {
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background-color: #eeeeee;
+}
+body::-webkit-scrollbar { display: none; }
+
+/* Căn bản */
+body {
+    line-height:132%;
+    font-family:"Times New Roman", Times, serif;
+    font-size:14pt;
+    margin:0; padding:0;
+}
+p { margin:0 0 0; }
+
+/* Giữ có thể chọn text khi cần (bỏ nếu muốn khóa chọn toàn trang) */
+/* body { -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; } */
+/* Chặn chọn text toàn trang */
+body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+::-webkit-scrollbar { display: none; }
+
+/* Các class tiếng Việt không dấu, ngắn gọn, dễ hiểu */
+.canh-giua-22 { text-align:center; line-height:132%; font-size:22pt; margin-bottom:0 }
+.canh-giua-14 { text-align:center; line-height:132%; font-size:14pt; margin-bottom:0 }
+
+.chu-14 { line-height:132%; font-size:14pt; margin-bottom:0 }
+.chu-do-14 { color:#ee0000; line-height:132%; font-size:14pt; margin-bottom:0 }
+.nen-vang { background-color:#ffff00; line-height:132%; font-size:14pt; margin-bottom:0 }
+
+.thut-36 { text-indent:36pt; line-height:132%; font-size:14pt; margin-bottom:0 }
+.thut-18 { text-indent:18pt; line-height:132%; font-size:14pt; margin-bottom:0 }
+
+.le-64 { margin-left:63.8pt; line-height:132%; font-size:14pt; margin-bottom:0 }
+.le-57 { margin-left:56.7pt; line-height:132%; font-size:14pt; margin-bottom:0 }
+.le-50 { margin-left:49.65pt; line-height:132%; font-size:14pt; margin-bottom:0 }
+.le-43 { margin-left:42.55pt; line-height:132%; font-size:14pt; margin-bottom:0 }
+.le-36 { margin-left:36pt; line-height:132%; font-size:14pt; margin-bottom:0 }
+.le-21 { margin-left:21.3pt; line-height:132%; font-size:14pt; margin-bottom:0 }
+.le-14 { margin-left:14.2pt; line-height:132%; font-size:14pt; margin-bottom:0 }
+
+.canht-justify { text-align:justify; line-height:132%; font-size:14pt; margin-bottom:0 }
+
+/* Bảng */
+.bang { margin-bottom:0pt; border:0.75pt solid #000000; padding:0; border-collapse:collapse; width:100%; max-width:100%}
+.bang td, .bang th { padding:0pt 5.03pt; vertical-align:top; border:0.75pt solid #000000; font-size:14pt; line-height:132% }
+.bang-chunhat { margin-bottom:0pt; border:0.75pt solid #000000; max-width: 100%; padding:0; border-collapse:collapse }
+.bang-chunhat td, .bang-chunhat th { padding:0pt 5.03pt; vertical-align:top; border:0.75pt solid #000000; font-size:14pt; line-height:132% }
+
+/* Khung speaking */
+.khung-speaking {
+    border:2pt solid #000000;
+    padding:10pt;
+    margin-bottom:10pt;
+    box-shadow: #000000 4pt 4pt 5pt;
+    background-color: #ffffff;
+    border-radius: 15px;
+    margin: 20px 50px 20px 50px;
+    animation: hien-len 0.25s ease-in-out;
+}
+
+/* Dropdown chọn speaking (transition-based to allow reverse) */
+#speaking-dropdown {
+    position: fixed; /* cố định giữa màn hình */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    z-index: 2001;
+    visibility: hidden;
+    opacity: 0;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    min-width: 220px;
+    font-size: 18pt;
+    pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.25s ease;
+}
+#speaking-dropdown.open {
+    visibility: visible;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+}
+#speaking-dropdown.closing {
+    visibility: hidden;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+    pointer-events: none;
+}
+#speaking-dropdown ul { list-style: none; margin:0; padding:8px; }
+#speaking-dropdown li { padding:10px 14px; cursor:pointer; border-radius:8px; text-align:center; margin: 1px;}
+#speaking-dropdown li:hover { background:#f2f2f2; color:#ff0000; font-weight:bold; }
+#speaking-dropdown li.active { font-weight:bold; background:#ddd; }
+
+/* Overlay dùng ::before */
+#overlay {
+    position: fixed; inset: 0;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #000000;
+    z-index: 2000;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+#overlay.show {
+    visibility: visible;
+    opacity: 0.6;
+    pointer-events: auto;
+}
+
+html.no-scroll, body.no-scroll {
+    overflow: hidden;
+}
+
+/* Hiệu ứng hiện lên */
+@keyframes hien-len {
+    0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+    100% { opacity: 1; transform: translateY(0px) scale(1); }
+}
+
+/* Toggle kiểu chữ giấu */
+.speaking-toggle { cursor: default; color: #000000; text-decoration: none; outline: none; }
+
+/* Khoảng trống dùng cho những dòng trắng trong file gốc */
+.khoang-trang { line-height:132%; font-size:14pt; margin-bottom:0; height:0.5em }
+
+/* Hiệu ứng khi scroll bằng lệnh mượt mà */
+html { scroll-behavior: smooth; }
+
+/* Responsive */
+@media (max-width:900px){
+    img { max-width:100%; height:auto; }
+    .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    table { width:100%; border-collapse:collapse; }
+    td, th { padding:8px; text-align:left; border:1px solid #ddd; }
+    #speaking-dropdown { min-width: 160px; font-size: 14pt; }
+    .khung-speaking { margin: 10px 10px; }
+}
+
+/* Tạo lớp highlight ảo */
+.word {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.word:hover {
+    background: rgba(0, 255, 200, 0.5);
+}
+.reading-highlight {
+    display: inline;
+    background: rgb(0, 255, 0);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    border-radius: 4px;
+    padding: 4px 0px;
+}
+.volume-icon {
+    cursor: pointer;
+    color: #007bff;
+    margin-right: 6px;
+    user-select: none;
+}
+.volume-icon:hover {
+    color: #0056b3;
+}
+.line-block {
+    display: block;
+    margin: 2px 0;
+}
+/* Context Menu */
+#ContextMenu {
+    position: fixed; /* cố định giữa màn hình */
+    z-index: 2001;
+    visibility: hidden;
+    opacity: 0;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    min-width: 220px;
+    font-size: 18pt;
+    /* pointer-events: none; */
+    animation: faceInMenu 0.3s ease forwards;
+}
+#ContextMenu.show {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+#ContextMenu ul {list-style: none; margin:0; padding:8px;}
+#ContextMenu li {display: flex; gap: 5px; align-items: center ;justify-items: center; padding:10px 14px; cursor:pointer; border-radius:8px; text-align:center; margin: 1px;}
+#ContextMenu li:hover { background:#f2f2f2; color:#000000; font-weight:normal; }
+#ContextMenu li i {pointer-events: none; transition: transform .1s ease, opacity .1s ease; }
+/* #ContextMenu #setting:hover i { opacity: 1; transform: scale(480) translate(1.3515625px, 0.578125px) ; } */
+#ContextMenu li:hover i { opacity: 1; transform: scale(1.2); }
+#ContextMenu li:active { font-weight:normal; background:#ddd; }
+
+#SettingMenu {
+    position: fixed; /* cố định giữa màn hình */
+    z-index: 2001;
+    visibility: hidden;
+    opacity: 0;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    min-width: 220px;
+    font-size: 18pt;
+    /* pointer-events: none; */
+    animation: faceInMenu 0.3s ease forwards;
+}
+#SettingMenu.show {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+#SettingMenu ul {list-style: none; margin:0; padding:8px;}
+#SettingMenu li {display: flex; gap: 5px; align-items: center ;justify-items: center; padding:10px 14px; cursor:pointer; border-radius:8px; text-align:center; margin: 1px;}
+#SettingMenu li:hover { background:#f2f2f2; color:#000000; font-weight:normal; }
+#SettingMenu li i {pointer-events: none; transition: transform .1s ease, opacity .1s ease; }
+/* #SettingMenu #setting:hover i { opacity: 1; transform: scale(480) translate(1.3515625px, 0.578125px) ; } */
+#SettingMenu li:hover i { opacity: 1; transform: scale(1.2); }
+#SettingMenu li:active { font-weight:normal; background:#ddd; }
+@keyframes fadeInMenu {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+</style>
+</head>
+<body>
+<!-- Context Menu -->
+<div id="ContextMenu">
+    <ul>
+        <li id="setting"><i class="fa fa-cog" aria-hidden="true"></i>Cài đặt</li>
+    </ul>
+</div>
+
+<!-- Setting Menu -->
+<div id="SettingMenu"><ul>Đang phát triển...</ul></div>
+
+<!-- Overlay -->
+<div id="overlay"></div>
+
+<!-- Dropdown container (dynamically filled) -->
+<div id="speaking-dropdown" role="menu" aria-hidden="true"><ul></ul></div>
+
+<!-- Speaking 1 -->
+<div class="khung-speaking" id="speaking1">
+    <p class="canh-giua-22"><strong><span class="speaking-toggle" data-index="0" tabindex="0">Speaking 1</span></strong></p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 1 – Social interaction</strong></p>
+
+    <p class="thut-36"><strong class="nen-vang">HOLIDAYS (Kỳ nghĩ)</strong></p>
+
+    <p class="le-64"><strong>1. What did you do on your last holidays?</strong></p>
+    <p class="le-64 chu-14"><strong>=&gt;</strong> Last holiday, I stayed at home and watched my favorite films.</p>
+
+    <p class="le-64 chu-14"><strong>2. Who do you prefer spending your holidays with? Relatives or friends?</strong></p>
+    <p class="le-64 chu-14"><strong>=&gt;</strong> I prefer spending holidays with my relatives because I feel warm and happy with my family. We can talk and share many things.</p>
+
+    <p class="le-64 canht-justify"><strong>3. Do you prefer to go on holiday abroad?</strong></p>
+    <p class="le-64 chu-14"><strong>=&gt;</strong> No, I don’t like going abroad because it costs a lot of money. Sometimes, I don’t speak English well, so it is difficult.</p>
+
+    <p class="thut-36"><strong class="nen-vang">TELEVISION (xem tivi)</strong></p>
+
+    <p class="le-64 chu-14"><strong>1. How many hours a day do you watch television?</strong></p>
+    <p class="le-64 chu-14">=&gt; I watch TV for about 30 (thirty) minutes every day.</p>
+
+    <p class="le-64 chu-14"><strong>2. Which programs do you like?</strong></p>
+    <p class="le-64 chu-14">=&gt; I like watching the news to know what is happening in the world. I also enjoy sports, music shows, movies, and game shows.</p>
+
+    <p class="le-64 chu-14"><strong>3. Do you prefer watching television alone or with other people? Why?</strong></p>
+    <p class="le-64 chu-14"><strong>=&gt;</strong> I like watching TV alone because I can watch my favorite program.</p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 2 – Situation discussion</strong></p>
+
+    <p class="thut-36 chu-14">If you won the lottery for 1 billion dollars, what would you do with the money? (1) Buy a new house, (2) start a business or (3) deposit the money in the bank. What would you choose?</p>
+
+    <p class="le-36 chu-14"><strong>=&gt; </strong><strong>Buy a new house</strong><br>I will buy a new house because:</p>
+    <p class="le-57 chu-14">- First, my old house is not big enough for my family.</p>
+    <p class="le-57 chu-14">- Second, my house is old and needs to be fixed.</p>
+    <p class="le-57 chu-14">- Finally, I want to give my parents a better house.</p>
+    <p class="chu-14">Buying a new house will make my family happy and comfortable.</p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 3 – Topic development</strong></p>
+    <p class="chu-14"><strong>Topic: Online courses have changed the way people learn (Việc học online thay đổi cách học)</strong></p>
+
+    <div class="table-wrap">
+    <table class="bang-chunhat">
+    <tr>
+    <td colspan="2">
+    <p class="chu-14"><strong>=&gt;</strong> Online courses are very popular now because they have many good points.</p>
+    <p class="chu-14">- First, online courses are easy to use. You only need a phone or a computer with the internet. You can study anytime and anywhere.</p>
+    <p class="chu-14">- Second, online learning helps people learn by themselves without a teacher nearby.</p>
+    <p class="chu-14">- Third, online courses give new ways to learn. You can study when you are traveling or at home.</p>
+    <p class="chu-14">- Finally, online courses usually cost less money than classes in school.</p>
+    <p class="chu-14">In conclusion, online courses make learning easier and more flexible. They are good for many people.</p>
+    </td>
+    </tr>
+    <tr>
+    <td colspan="2">
+    <p class="chu-14"><strong>Follow-up questions (câu hỏi mở rộng)</strong></p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>1. What advice would you give someone on how to study English?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">To learn English well, I think we should:</p>
+    <p class="chu-14">- Practice speaking English every day.</p>
+    <p class="chu-14">- Read English books, newspapers, or magazines.</p>
+    <p class="chu-14">- Watch English movies and listen to English songs.</p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>2. Do you think being a student is the best time of your life?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">- Yes, because students have fewer problems than adults. They do not have to worry about work or family.</p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>3. Should university education be free or should students get a loan?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">Students should get a loan because:</p>
+    <p class="chu-14">- When students borrow money, they will try harder to study.</p>
+    <p class="chu-14">They will be more responsible for their learning.</p>
+    </td>
+    </tr>
+    </table>
+    </div>
+
+    <p class="khoang-trang">&nbsp;</p>
+</div>
+
+<!-- Speaking 2 -->
+<div class="khung-speaking" id="speaking2">
+    <p class="canh-giua-22"><strong><span class="speaking-toggle" data-index="1" tabindex="0">Speaking 2</span></strong></p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 1 – Social interaction</strong></p>
+
+    <p class="thut-36"><strong class="nen-vang">BIRTHDAY: SINH NHẬT</strong></p>
+
+    <p class="le-57 chu-14"><strong>1. When is your birthday?</strong><br>&gt; My birthday is on April <strong>15 (fifteen)</strong>.</p>
+
+    <p class="le-57 chu-14"><strong>2. Which year?</strong><br>&gt; I was born in <strong>nineteen eighty</strong> (1980).</p>
+
+    <p class="le-57 chu-14"><strong>3. What do you usually do on your birthday?</strong><br>&gt; I usually have a party with my family and friends. We eat cake and enjoy time together.</p>
+
+    <p class="le-57 chu-14"><strong>4. What is your favorite family celebration? Why?</strong><br>&gt; I like the Tet holiday because it is fun and a great time for family to be together and talk.</p>
+
+    <p class="thut-36"><strong class="nen-vang">TRANSPORTATION: PHƯƠNG TIỆN GIAO THÔNG</strong></p>
+
+    <p class="le-57 chu-14"><strong>1. What is the best way to travel in your town/city?</strong><br>&gt; The best way to travel is by motorbike because it is fast and easy.</p>
+
+    <p class="le-57 chu-14"><strong>2. What is your favorite means of transportation?</strong><br>&gt; My favorite means of transportation is by bus because it is cheap and comfortable.</p>
+
+    <p class="le-57 chu-14"><strong>3. Do you think people should use public transportation more? Why or why not?</strong><br>&gt; Yes, they should because it helps reduce traffic and pollution.</p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 2 – Situation discussion</strong></p>
+
+    <p class="thut-36 chu-14"><strong>Situation:</strong> A student wants a part-time job to practice English. There are three choices: a souvenir shop, a travel agency, or a take-away shop. Which job is best?</p>
+
+    <p class="le-50 chu-14">=&gt; In my opinion, I will choose a job at a travel agency. It’s because:</p>
+    <p class="le-50 chu-14">- Firstly, the student can meet many foreigners and practice English often.</p>
+    <p class="le-50 chu-14">- Secondly, the student can visit new places, even other countries.</p>
+    <p class="le-50 chu-14">- Finally, the student will read many English papers like brochures, maps, and forms.</p>
+    <p class="le-50 chu-14">That’s all.</p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 3 – Topic development</strong></p>
+    <p class="chu-14"><strong>Topic: Examinations are not necessary</strong></p>
+
+    <div class="table-wrap">
+    <table class="bang">
+    <tr>
+    <td colspan="2">
+    <p class="chu-14">=&gt; In my opinion, sometimes examinations are not necessary for these reasons:</p>
+    <p class="chu-14">- First, exams cost a lot of money for both schools and students.</p>
+    <p class="chu-14">- Second, preparing for exams takes a lot of time from both teachers and students.</p>
+    <p class="chu-14">- Third, it is not fair to judge a person’s ability by one exam. Sometimes, students feel tired or nervous.</p>
+    <p class="chu-14">- Finally, exams can cause stress and affect students’ health.</p>
+    <p class="chu-14">To conclude, I think exams are not always necessary because they waste time and money and are not always fair.</p>
+    </td>
+    </tr>
+    <tr>
+    <td colspan="2">
+    <p class="chu-14">Follow – up questions</p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>1. Do you think schools are necessary? Why? If not, why not?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">Yes, I do think schools are necessary. Because schools help us learn important knowledge. Also, going to school lets us meet new friends and practice talking with others. This helps us build good social skills.</p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>2. How do modern technologies change the way people study?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">In the past, people only learned in classrooms. But now, with a computer or smartphone and internet, people can study anytime and anywhere. They can learn at home, in a café, or while traveling. This makes learning easier and more flexible.</p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>3. Do you think that traditional schools will disappear in the future because of the development of modern technology?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">I don’t think traditional schools will disappear. Technology will help teachers and students but cannot replace them completely. The teachers and students need to talk and work together. Technology is a good tool to support learning, not to take the place of teachers.</p>
+    </td>
+    </tr>
+    </table>
+    </div>
+
+    <p class="khoang-trang">&nbsp;</p>
+</div>
+
+<!-- Speaking 3 -->
+<div class="khung-speaking" id="speaking3">
+    <p class="canh-giua-22"><strong><span class="speaking-toggle" data-index="2" tabindex="0">Speaking 3</span></strong></p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 1 – Social interaction</strong></p>
+
+    <p class="le-21 chu-14"><strong class="nen-vang">MUSIC: Âm nhạc</strong></p>
+
+    <p class="le-36 chu-14"><strong>1. Do you like music? What kind of music do you like best? Why?</strong><br>&gt; Yes, I like music. I enjoy pop, ballad, jazz, folk songs, classical music, or bolero. Because music helps me relax and reduce stress.</p>
+
+    <p class="thut-36 chu-14"><strong>2. What is the most popular kind of music in your country?</strong></p>
+    <p class="thut-36 chu-14">=&gt; The most popular music in my country is bolero and pop music.</p>
+
+    <p class="le-36 chu-14"><strong>3. How is music good or not good for people?</strong><br>&gt; I think music is good for people’s minds because it helps them feel happy and calm. But sometimes music can make people sad or stop them from focusing on their work.</p>
+
+    <p class="le-21 chu-14"><strong class="nen-vang">SPORTS: Thể thao</strong></p>
+
+    <p class="le-36 chu-14"><strong>1. Do you play any sports?</strong><br>&gt; Yes, I do. I play football, volleyball, basketball, badminton, table tennis, or tennis. I like swimming because it helps me be healthier and more energetic.<br><strong>2. What sports do you enjoy watching?</strong><br>&gt; I love watching football.</p>
+
+    <p class="le-36 chu-14"><strong>3. What sports do you enjoy playing?</strong><br>&gt; I enjoy playing football and badminton.</p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 2 – Situation discussion</strong></p>
+
+    <p class="chu-14"><strong>Situation:</strong> Some of your friends are visiting you this weekend. You would like to do something fun with them. There are THREE options for you to choose from: (1) cook a meal together at your house, (2) go to a local restaurant, or (3) take them sightseeing.</p>
+
+    <p class="chu-14"><strong>=&gt; In my opinion, I will choose to go to a local restaurant. It’s because:</strong></p>
+
+    <p class="thut-18 chu-14">- We don’t need to waste time cooking or cleaning. We can spend more time talking and sharing memories.</p>
+    <p class="thut-18 chu-14">- Restaurants offer many kinds of food, so friends can choose what they like.</p>
+    <p class="chu-14">Waiters serve the food, so we can relax and enjoy the meal comfortably.</p>
+
+    <p class="khoang-trang">&nbsp;</p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 3 – Topic development</strong></p>
+    <p class="chu-14"><strong>Topic: Smoking should be banned in public places.</strong></p>
+
+    <div class="table-wrap">
+    <table class="bang">
+    <tr>
+    <td colspan="2">
+    <p class="chu-14">In my opinion, smoking should be banned in public places for some reasons:</p>
+    <p class="chu-14">- First, smoking is harmful to people’s health. It can cause lung problems and cancer after a long time.</p>
+    <p class="chu-14">- Second, smoking affects people near the smoker, called second-hand smokers. For example, babies and women can get sick if they breathe smoke from their family members. Smoking during pregnancy can harm the baby.</p>
+    <p class="chu-14">- Third, smokers spend a lot of money on cigarettes. This can cause stress and make their life harder.</p>
+    <p class="chu-14">- Finally, cigarette butts pollute the environment because they are hard to break down. Smoking can also cause fires.</p>
+    <p class="chu-14">- Smoking also sets a bad example for children who might try to copy it.</p>
+    <p class="chu-14">Because of these reasons, I think smoking should be banned in public places like schools, hospitals, and bus stations.</p>
+    </td>
+    </tr>
+    <tr>
+    <td colspan="2">
+    <p class="chu-14"><strong>Follow-up questions:</strong></p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>Do you smoke?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">No, I don’t. / Yes, I do.</p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>Why do many people want to smoke?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">- People smoke to relax and reduce stress.</p>
+    <p class="chu-14">- Some smoke for fun.</p>
+    <p class="chu-14">- Others think smoking helps them focus, get new ideas, or seem more grown-up.</p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>What should be done to prevent smoking in public places?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">I think the government should:</p>
+    <p class="chu-14">- Put heavy fines on people who smoke in public.</p>
+    <p class="chu-14">- Help people know the bad effects of smoking.</p>
+    <p class="chu-14">- Put “No Smoking” signs in public places.</p>
+    </td>
+    </tr>
+    </table>
+    </div>
+
+    <p class="khoang-trang">&nbsp;</p>
+</div>
+
+<!-- Speaking 4 -->
+<div class="khung-speaking" id="speaking4">
+    <p class="canh-giua-22"><strong><span class="speaking-toggle" data-index="3" tabindex="0">Speaking 4</span></strong></p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 1 – Social interaction</strong></p>
+
+    <p class="le-14 chu-14"><strong class="nen-vang">LEISURE ACTIVITIES: Hoạt động giải trí</strong></p>
+
+    <p class="le-36 chu-14"><strong>1. Where do you usually go in your spare time?</strong><br>&gt; I usually go shopping at malls, go fishing, or go to a coffee shop with my friends. Sometimes I watch movies at the cinema or visit the zoo and park.</p>
+
+    <p class="le-14 chu-14"><strong>2. Are there many interesting places where you live for people to go at the weekend?</strong><br>&gt; Yes, there are many. People often go to the zoo, park, An Binh Island, or popular attractions like eco-resorts at the weekend.</p>
+
+    <p class="le-36 chu-14"><strong>3. Why is a café a great place for people to enjoy their free time?</strong><br>&gt; A café is a relaxing and peaceful place for people to hang out and chat with friends after a hard-working day. It’s comfortable and helps people relax.</p>
+
+    <p class="le-21 chu-14"><strong class="nen-vang">BEST FRIEND: Bạn thân</strong></p>
+
+    <p class="le-36 chu-14"><strong>1. What does your best friend look like?</strong><br>&gt; My best friend is An. She is tall, pretty, friendly, and funny. She is kind, honest, and reliable. She always makes me laugh and gives good advice.</p>
+
+    <p class="le-36 chu-14"><strong>2. How did you meet your best friend?</strong><br>&gt; We met at university / She lives next to my house / She is my classmate / We work at the same company.</p>
+
+    <p class="le-36 chu-14"><strong>3. What is the best quality of a good friend?</strong><br>&gt; A good friend should be loyal and reliable. They never talk badly about me behind my back and always help when I have problems.</p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 2 – Situation discussion</strong></p>
+
+    <p class="chu-14"><strong>Situation:</strong> Your friend is going to have his first date this weekend. He would like you to give an advice on where to go. There are THREE options for you to choose from: (1) restaurant, (2) cinema, or (3) shopping mall. Which do you think is the best place for the first date?</p>
+
+    <p class="chu-14">=&gt; In my opinion, the best place for a first date is the cinema because:</p>
+    <p class="thut-18 chu-14">- Firstly, it’s a good chance for him to express his feelings while watching a romantic film.</p>
+    <p class="thut-18 chu-14">- Secondly, they can sit together and share their thoughts about the movie.</p>
+    <p class="thut-18 chu-14">- Finally, restaurants and malls are often noisy and crowded, which may disturb their conversation.</p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 3 – Topic development</strong></p>
+    <p class="chu-14"><strong>Topic: Airplane is the best transport means to travel long distance.</strong></p>
+
+    <div class="table-wrap">
+    <table class="bang">
+    <tr>
+    <td colspan="2">
+    <p class="chu-14">The airplane is the best way to travel long distances for several reasons:</p>
+    <p class="chu-14">- First, it saves a lot of time compared to other transport means.</p>
+    <p class="chu-14">- Second, airplanes are very safe; accidents happen less often than with other vehicles.</p>
+    <p class="chu-14">- Third, flying is comfortable and enjoyable, with good services on board.</p>
+    <p class="chu-14">- Finally, flying is a great experience and one of the best inventions of humans. Everyone should try flying at least once.</p>
+    <p class="chu-14">In short, although every transport has advantages and disadvantages, I think the airplane is the best choice for long-distance travel.</p>
+    </td>
+    </tr>
+    <tr>
+    <td colspan="2">
+    <p class="chu-14"><strong>Follow-up questions:</strong></p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>Do you think the airplane is the most important transport means of all time? Why?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">Yes, I do. It is fast, convenient, and comfortable, carrying many passengers over long distances.</p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>Are there any disadvantages of traveling by airplane?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">Yes, the tickets are often expensive.</p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>How can airlines improve the flying experience?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">They can make seats more comfortable, lower ticket prices, and give better information when flights are delayed to avoid wasting passengers’ time.</p>
+    </td>
+    </tr>
+    </table>
+    </div>
+
+    <p class="khoang-trang">&nbsp;</p>
+</div>
+
+<!-- Speaking 5 -->
+<div class="khung-speaking" id="speaking5">
+    <p class="canh-giua-22"><strong><span class="speaking-toggle" data-index="4" tabindex="0">Speaking 5</span></strong></p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 1 – Social interaction</strong></p>
+
+    <p class="le-21 chu-14"><strong class="nen-vang">SOCIAL NETWORKS: MẠNG XÃ HỘI</strong></p>
+
+    <p class="le-43 chu-14"><strong>1. Do you like social networks?</strong><br>&gt; No, I don’t because it wastes a lot of time.</p>
+
+    <p class="le-43 chu-14"><strong>2. What kinds of social networks are you using now?</strong><br>&gt; I am using Facebook, Instagram, and TikTok.</p>
+
+    <p class="le-43 chu-14"><strong>3. What is your advice for social network users?</strong><br>&gt; People should be careful with the information they share on social networks. They shouldn’t show personal details or click on strange links.</p>
+
+    <p class="le-21 chu-14"><strong class="nen-vang">FASHION: THỜI TRANG</strong></p>
+
+    <p class="le-43 chu-14"><strong>1. How important is fashion to you?</strong><br>&gt; I think fashion is important because it shows politeness and respect for others.</p>
+
+    <p class="le-43 chu-14"><strong>2. What kind of clothes do you prefer to wear?</strong><br>&gt; I prefer casual clothes like T-shirts and jeans. Sometimes I like shorts, dresses, or sporty outfits.</p>
+
+    <p class="le-43 chu-14"><strong>3. Do you ever have to wear things you don’t like? Why?</strong><br>&gt; No, I’m lucky because I usually wear clothes that make me feel comfortable.</p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 2 – Situation discussion</strong></p>
+
+    <p class="chu-14"><strong>Situation:</strong> Your friend would like you to give him/her some advice on how to lose weight. There are THREE options for you to choose from: (1) skipping meals, (2) using drugs, or (3) exercising regularly. Which do you think is the best choice?</p>
+
+    <p class="chu-14">=&gt; In my opinion, exercising regularly is the best choice because:</p>
+    <p class="thut-18 chu-14">- Firstly, it helps burn calories and get in shape.</p>
+    <p class="thut-18 chu-14">- When combined with a good diet, it improves health and reduces stress, making people more energetic.</p>
+    <p class="thut-18 chu-14">- Finally, skipping meals and using drugs can cause serious side effects like stomach problems and weak immune systems.</p>
+    <p class="chu-14">In short, exercising regularly is the safest and most effective option.</p>
+
+    <p class="khoang-trang">&nbsp;</p>
+
+    <p class="chu-14"><strong class="chu-do-14">PHẦN 3 – Topic development</strong></p>
+    <p class="chu-14"><strong>Topic: Things that affect people’s job satisfaction</strong></p>
+
+    <div class="table-wrap">
+    <table class="bang">
+    <tr>
+    <td colspan="2">
+    <p class="chu-14">In my opinion, job satisfaction depends on several key factors.</p>
+    <p class="chu-14"><strong>- Firstly,</strong> qualifications help decide the right position and salary, which affects satisfaction. For example, someone with higher qualifications usually gets a better-paid job that meets their expectations.</p>
+    <p class="chu-14"><strong>- Secondly,</strong> a positive attitude at work makes people enjoy their jobs more. If employees feel confident and motivated, they are likely to be more productive and happier.</p>
+    <p class="chu-14"><strong>- Thirdly,</strong> good relationships with colleagues create a friendly environment and improve teamwork. This can make daily work more enjoyable and reduce stress.</p>
+    <p class="chu-14"><strong>- Finally,</strong> comfortable and safe working conditions help employees focus better and feel valued.</p>
+    <p class="chu-14"><strong>In short,</strong> all these factors together influence how satisfied people are with their jobs.</p>
+    </td>
+    </tr>
+    <tr>
+    <td colspan="2">
+    <p class="chu-14"><strong>Follow-up questions:</strong></p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>Do you think companies should promote experienced workers?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">In my opinion, promotion should be based on excellent performance and completing tasks well, not only on experience.</p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>Do you think workers should change companies often? Why/Why not?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">Yes, but not too often. Changing jobs can help workers gain new skills, preparing them better for future positions.</p>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <p class="chu-14"><strong>What motivates workers more: salary or working conditions?</strong></p>
+    </td>
+    <td>
+    <p class="chu-14">I think most workers prefer salary because it provides financial security. However, good working conditions are also important for long-term happiness.</p>
+    </td>
+    </tr>
+    </table>
+    </div>
+
+    <p class="khoang-trang">&nbsp;</p>
+</div>
+
+<script defer src="./script.js" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" crossorigin="anonymous"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const speakings = Array.from(document.querySelectorAll('.khung-speaking'));
+  const toggles = Array.from(document.querySelectorAll('.speaking-toggle'));
+  const dropdown = document.getElementById('speaking-dropdown');
+  const overlay = document.getElementById('overlay');
+  const dropdownList = dropdown.querySelector('ul');
+  let currentIndex = 0;
+
+  // Hiển thị 1 khung speaking
+  function showSpeaking(index) {
+    speakings.forEach((el, i) => el.style.display = (i === index) ? 'block' : 'none');
+    currentIndex = index;
+    updateDropdownItems();
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+
+  // Tạo danh sách dropdown
+  function buildDropdown() {
+    dropdownList.innerHTML = '';
+    speakings.forEach((s, i) => {
+      const li = document.createElement('li');
+      const t = s.querySelector('.speaking-toggle');
+      li.textContent = t ? t.textContent.trim() : `Speaking ${i + 1}`;
+      li.dataset.index = i;
+      li.addEventListener('click', e => {
+        showSpeaking(i);
+        closeDropdown();
+        e.stopPropagation();
+      });
+      dropdownList.appendChild(li);
+    });
+    updateDropdownItems();
+  }
+
+  function updateDropdownItems() {
+    dropdownList.querySelectorAll('li').forEach((li, i) => {
+      li.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  // Mở dropdown giữa màn hình
+  function openDropdownAt() {
+    buildDropdown();
+    dropdown.style.visibility = 'visible';
+    dropdown.classList.remove('closing');
+    dropdown.classList.add('open');
+    overlay.classList.add('show');
+    dropdown.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('no-scroll');
+    document.documentElement.classList.add('no-scroll');
+  }
+
+  // Đóng dropdown với hiệu ứng đảo ngược
+  function closeDropdown() {
+    if (dropdown.classList.contains('closing') || !dropdown.classList.contains('open')) return;
+    dropdown.classList.remove('open');
+    overlay.classList.remove('show');
+    dropdown.classList.add('closing');
+    dropdown.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll');
+    document.documentElement.classList.remove('no-scroll');
+    dropdown.addEventListener('animationend', function endAnim(e) {
+      if (e.animationName === 'hien-len') {
+        dropdown.classList.remove('closing');
+        dropdown.style.visibility = 'hidden';
+        dropdown.removeEventListener('animationend', endAnim);
+      }
+    });
+  }
+
+  // Gán sự kiện toggle
+  toggles.forEach(tg => {
+    tg.addEventListener('click', e => {
+      e.stopPropagation();
+      if (dropdown.classList.contains('open')) closeDropdown();
+      else openDropdownAt();
+    });
+  });
+
+  // Đóng khi click ngoài
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#speaking-dropdown') && !e.target.closest('.speaking-toggle')) {
+      closeDropdown();
+    }
+  });
+
+  // ESC để thoát
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeDropdown();
+  });
+
+  // Khởi tạo
+  dropdown.style.visibility = 'hidden';
+  buildDropdown();
+  showSpeaking(0);
+});
+</script>
+<script src="./speak.js"></script>
+<script src="./menu.js"></script>
+<script src="https://code.responsivevoice.org/responsivevoice.js?key=QBl4tPaF"></script>
+</body>
+</html>
